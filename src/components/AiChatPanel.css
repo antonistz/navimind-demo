@@ -1,0 +1,123 @@
+/* src/components/AiChatPanel.css */
+
+.ai-chat-card {
+  background: rgba(15, 23, 42, 0.96);
+  border-radius: 0.75rem;
+  border: 1px solid #1f2937;
+  padding: 0.75rem 1rem 0.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.ai-chat-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 0.5rem;
+}
+
+.ai-chat-card h2 {
+  margin: 0;
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: #f8fafc;
+}
+
+.ai-chat-subtitle {
+  margin: 0.15rem 0 0;
+  font-size: 0.78rem;
+  color: #9ca3af;
+}
+
+.ai-chat-badge {
+  font-size: 0.7rem;
+  padding: 2px 7px;
+  border-radius: 999px;
+  border: 1px solid #22d3ee;
+  color: #e0f2fe;
+  background: rgba(8, 47, 73, 0.7);
+  white-space: nowrap;
+}
+
+.ai-chat-messages {
+  max-height: 190px;
+  overflow-y: auto;
+  padding-right: 0.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.ai-chat-message {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.ai-chat-message.user .ai-chat-bubble {
+  background: rgba(15, 23, 42, 0.9);
+  border-color: #1f2937;
+}
+
+.ai-chat-message.ai .ai-chat-bubble {
+  background: rgba(15, 23, 42, 0.9);
+  border-color: #22d3ee;
+}
+
+.ai-chat-meta {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: 0.82rem;
+  color: #9ca3af;
+}
+
+.ai-chat-role {
+  font-weight: 500;
+}
+
+.ai-chat-dot {
+  font-size: 0.6rem;
+}
+
+.ai-chat-bubble {
+  font-size: 0.95rem;
+  line-height: 1.35;
+  color: #e5e7eb;
+  border-radius: 0.6rem;
+  border: 1px solid #1f2937;
+  padding: 0.4rem 0.55rem;
+}
+
+.ai-chat-input-bar {
+  margin-top: 0.25rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  opacity: 0.6;
+}
+
+.ai-chat-input-bar input {
+  flex: 1;
+  background: #020617;
+  border-radius: 999px;
+  border: 1px solid #1f2937;
+  padding: 0.35rem 0.7rem;
+  font-size: 0.85rem;
+  color: #9ca3af;
+}
+
+.ai-chat-input-bar input::placeholder {
+  color: #6b7280;
+}
+
+.ai-chat-input-bar button {
+  border-radius: 999px;
+  border: 1px solid #1f2937;
+  background: #020617;
+  padding: 0.3rem 0.9rem;
+  font-size: 0.75rem;
+  color: #6b7280;
+  cursor: not-allowed;
+}

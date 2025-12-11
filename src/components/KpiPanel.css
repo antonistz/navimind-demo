@@ -1,0 +1,54 @@
+/* src/components/KpiPanel.css */
+
+.kpi-card {
+  background: rgba(15, 23, 42, 0.95);
+  border-radius: 0.75rem;
+  border: 1px solid #1f2937;
+  padding: 1.2rem 1.3rem;
+  font-size: 0.95rem;   /* NEW: baseline font size in the card */
+}
+
+.kpi-card h2 {
+  margin: 0;
+  font-size: 1.05rem;
+  color: #f8fafc; /* brighter section header */
+}
+
+.kpi-subtitle {
+  margin: 0.25rem 0 0.75rem;
+  font-size: 1rem;
+  color: #9ca3af;
+}
+
+.kpi-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.5rem;
+}
+
+.kpi-item {
+  background: rgba(15, 23, 42, 0.75);
+  border-radius: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid #111827;
+}
+
+.kpi-label {
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: #f3f4f6;  /* soft white for clarity */
+}
+
+
+.kpi-main {
+  font-size: 1.2rem;
+  font-weight: 600;
+  margin-top: 0.1rem;
+  color: #fef08a; /* bright warm yellow for visibility */
+}
+
+.kpi-delta {
+  margin-top: 0.2rem;
+  font-size: 1rem;
+  color: #a3e635;
+}

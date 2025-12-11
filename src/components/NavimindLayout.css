@@ -1,0 +1,126 @@
+/* src/components/NavimindLayout.css */
+
+.navimind-container {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: 100%;
+  margin: 0 auto;
+  padding: 0rem 1.5rem;
+  gap: 1rem;
+}
+
+.navimind-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 1rem;
+}
+
+.navimind-header h1 {
+  margin: 0;
+  font-size: 1.4rem;
+  color: #f8fafc; /* brighter heading */
+}
+
+.subtitle {
+  margin: 0.25rem 0 0;
+  font-size: 0.85rem;
+  color: #9ca3af;
+}
+
+.voyage-selector {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.voyage-selector .label {
+  font-size: 0.85rem;
+  color: #9ca3af;
+}
+
+.voyage-selector select {
+  background: #020617;
+  border-radius: 999px;
+  padding: 0.3rem 0.75rem;
+  border: 1px solid #1f2937;
+  color: #e5e7eb;
+  font-size: 0.85rem;
+}
+
+.navimind-main {
+  display: grid;
+  grid-template-columns: 4fr 2fr;
+  gap: 1rem;
+  min-height: 480px;
+}
+
+.navimind-left {
+  border-radius: 0.75rem;
+  overflow: hidden;
+  border: 1px solid #1f2937;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.45);
+}
+
+.navimind-right {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.navimind-footer {
+  margin-top: 0.25rem;
+}
+
+/* ---------- Responsive layout ---------- */
+
+/* Tablets / small laptops */
+@media (max-width: 1024px) {
+  .navimind-main {
+    grid-template-columns: 1fr;      /* stack map and right column */
+    grid-template-rows: auto auto;
+  }
+
+  .navimind-left,
+  .navimind-right {
+    width: 100%;
+  }
+
+  .navimind-right {
+    margin-top: 0.75rem;
+  }
+
+  .navimind-container {
+    padding: 0.75rem 0.75rem 1rem;
+  }
+
+  .navimind-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.4rem;
+  }
+
+  .voyage-selector {
+    align-self: flex-start;
+  }
+}
+
+/* Phones */
+@media (max-width: 640px) {
+  .navimind-container {
+    padding: 0.5rem 0.5rem 0.75rem;
+  }
+
+  .navimind-main {
+    gap: 0.75rem;
+  }
+
+  .navimind-left {
+    border-radius: 0.5rem;
+  }
+
+  .navimind-right {
+    gap: 0.75rem;
+  }
+}

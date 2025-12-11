@@ -1,0 +1,15 @@
+/* src/components/VoyageInfoBar.css */
+
+.voyage-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+  font-size: 0.8rem;
+  color: #9ca3af;
+  padding: 0.5rem 0.25rem 0;
+  border-top: 1px solid #111827;
+}
+
+.voyage-bar .label {
+  color: #6b7280;
+}

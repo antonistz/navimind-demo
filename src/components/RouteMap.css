@@ -1,0 +1,76 @@
+/* src/components/RouteMap.css */
+
+.route-map-wrapper {
+  position: relative;
+  height: 100%;
+  min-height: 480px;
+}
+
+.route-map-container {
+  height: 100%;
+  width: 100%;
+}
+
+/* Legend overlay in top-left */
+.route-legend {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  background: rgba(15, 23, 42, 0.9);
+  border-radius: 0.5rem;
+  padding: 0.4rem 0.7rem;
+  font-size: 0.75rem;
+  color: #e5e7eb;
+  border: 1px solid #1f2937;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.legend-line {
+  width: 26px;
+  height: 3px;
+  border-radius: 999px;
+}
+
+.legend-line.baseline {
+  background: #6b7280; /* same as baseline polyline */
+}
+
+.legend-line.optimal {
+  background: #22d3ee; /* same as optimal polyline */
+}
+
+/* Route labels on map (Leaflet divIcons) */
+.route-label {
+  display: inline-block;
+  background: rgba(15, 23, 42, 0.95);
+  border-radius: 999px;
+  padding: 2px 7px;
+  font-size: 0.56rem;
+  line-height: 1.1;
+  color: #e5e7eb;
+  border: 1px solid #1f2937;
+  white-space: nowrap;
+  pointer-events: none; /* mouse events pass through */
+}
+
+.route-label.baseline-label {
+  border-color: #6b7280;
+}
+
+.route-label.optimal-label {
+  border-color: #22d3ee;
+}
+
+@media (max-width: 640px) {
+  .route-map-wrapper {
+    min-height: 360px;   /* shorter but still usable on phones */
+  }
+}
