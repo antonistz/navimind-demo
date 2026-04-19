@@ -1,14 +1,13 @@
-// src/components/NavimindLayout.jsx
 import { useState } from 'react';
 import RouteMap from './RouteMap';
 import KpiPanel from './KpiPanel';
 import AiExplanationPanel from './AiExplanationPanel';
 import VoyageInfoBar from './VoyageInfoBar';
-import './NavimindLayout.css';
 import AiChatPanel from './AiChatPanel';
+import type { Voyage, Route } from '../types';
+import './NavimindLayout.css';
 
-// Dummy hard-coded data for v0 demo
-const DEMO_VOYAGE = {
+const DEMO_VOYAGE: Voyage = {
   id: 'Athens-Heraklion',
   origin: 'Athens / Piraeus (GR)',
   destination: 'Heraklion (GR)',
@@ -24,30 +23,23 @@ const DEMO_VOYAGE = {
   co2Optimal: 101,
 };
 
-
-// visually believable path that goes through the Adriatic → Ionian → Mediterranean → Gibraltar → Atlantic → Rotterdam.
-// These are not geo-accurate, they’re just for visualization.
-// Baseline: direct-ish Athens → mid-Aegean → north of Crete → Heraklion
-const BASELINE_ROUTE = [
-  [37.94, 23.62],  // Piraeus
-  [37.2,  24.2],   // central Aegean
-  [36.5,  25.0],   // north of Crete
-  [35.34, 25.13],  // Heraklion
+const BASELINE_ROUTE: Route = [
+  [37.94, 23.62],
+  [37.2,  24.2],
+  [36.5,  25.0],
+  [35.34, 25.13],
 ];
 
-// Optimal: slightly more southern track (e.g. avoiding rougher seas)
-const OPTIMAL_ROUTE = [
-  [37.94, 23.62],  // Piraeus
-  [36.9,  24.1],   // south of baseline
-  [36.2,  24.8],   // closer to Crete earlier
-  [35.6,  25.1],   // along north coast of Crete
-  [35.34, 25.13],  // Heraklion
+const OPTIMAL_ROUTE: Route = [
+  [37.94, 23.62],
+  [36.9,  24.1],
+  [36.2,  24.8],
+  [35.6,  25.1],
+  [35.34, 25.13],
 ];
-
-
 
 function NavimindLayout() {
-  const [selectedVoyage] = useState(DEMO_VOYAGE);
+  const [selectedVoyage] = useState<Voyage>(DEMO_VOYAGE);
 
   return (
     <div className="navimind-container">
@@ -60,7 +52,7 @@ function NavimindLayout() {
         </div>
         <div className="voyage-selector">
           <span className="label">Voyage:</span>
-          <select value={selectedVoyage.id} readOnly>
+          <select value={selectedVoyage.id} onChange={() => {}}>
             <option value="Athens-Heraklion">Athens → Heraklion</option>
           </select>
         </div>
@@ -73,12 +65,11 @@ function NavimindLayout() {
             optimalRoute={OPTIMAL_ROUTE}
           />
         </div>
-<div className="navimind-right">
-  <KpiPanel voyage={selectedVoyage} />
-  <AiExplanationPanel voyage={selectedVoyage} />
-  <AiChatPanel voyage={selectedVoyage} />
-</div>
-
+        <div className="navimind-right">
+          <KpiPanel voyage={selectedVoyage} />
+          <AiExplanationPanel voyage={selectedVoyage} />
+          <AiChatPanel voyage={selectedVoyage} />
+        </div>
       </main>
 
       <footer className="navimind-footer">

@@ -1,7 +1,11 @@
-// src/components/VoyageInfoBar.jsx
+import type { Voyage } from '../types';
 import './VoyageInfoBar.css';
 
-function VoyageInfoBar({ voyage }) {
+interface VoyageInfoBarProps {
+  voyage: Voyage;
+}
+
+function VoyageInfoBar({ voyage }: VoyageInfoBarProps) {
   const { origin, destination, objective } = voyage;
 
   return (
