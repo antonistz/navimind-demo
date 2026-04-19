@@ -1,41 +1,32 @@
 import { render, screen } from '@testing-library/react';
 import AiChatPanel from '../components/AiChatPanel';
-import { mockVoyage } from './fixtures';
+import { mockVoyage, mockSeedMessages } from './fixtures';
 
 describe('AiChatPanel', () => {
   it('renders without crashing', () => {
-    render(<AiChatPanel voyage={mockVoyage} />);
+    render(<AiChatPanel voyage={mockVoyage} seedMessages={mockSeedMessages} />);
     expect(screen.getByText('NaviMind Assistant')).toBeInTheDocument();
   });
 
-  it('shows demo badge', () => {
-    render(<AiChatPanel voyage={mockVoyage} />);
-    expect(screen.getByText('Demo')).toBeInTheDocument();
+  it('renders seed messages', () => {
+    render(<AiChatPanel voyage={mockVoyage} seedMessages={mockSeedMessages} />);
+    expect(screen.getByText('Why does the route deviate south?')).toBeInTheDocument();
+    expect(screen.getByText('The straight-line track crosses rough seas.')).toBeInTheDocument();
   });
 
-  it('chat input is disabled in demo mode', () => {
-    render(<AiChatPanel voyage={mockVoyage} />);
-    expect(screen.getByPlaceholderText(/demo mode/)).toBeDisabled();
+  it('chat input is enabled', () => {
+    render(<AiChatPanel voyage={mockVoyage} seedMessages={mockSeedMessages} />);
+    expect(screen.getByPlaceholderText(/Ask about/)).not.toBeDisabled();
   });
 
-  it('send button is disabled in demo mode', () => {
-    render(<AiChatPanel voyage={mockVoyage} />);
+  it('send button is disabled when input is empty', () => {
+    render(<AiChatPanel voyage={mockVoyage} seedMessages={mockSeedMessages} />);
     expect(screen.getByRole('button', { name: /Send/ })).toBeDisabled();
   });
 
-  it('includes destination in user question', () => {
-    render(<AiChatPanel voyage={mockVoyage} />);
-    expect(screen.getByText(/Heraklion/)).toBeInTheDocument();
-  });
-
-  it('AI response references baseline wave height', () => {
-    render(<AiChatPanel voyage={mockVoyage} />);
-    expect(screen.getByText(/3\.2/)).toBeInTheDocument();
-  });
-
-  it('AI response includes calculated fuel saving', () => {
-    // (35 - 32) / 35 * 100 = 8.6%
-    render(<AiChatPanel voyage={mockVoyage} />);
-    expect(screen.getByText(/8\.6%/)).toBeInTheDocument();
+  it('shows fuel saving percentage in badge', () => {
+    render(<AiChatPanel voyage={mockVoyage} seedMessages={mockSeedMessages} />);
+    // (35-32)/35*100 = 8.6%
+    expect(screen.getByText(/8\.6% fuel saved/)).toBeInTheDocument();
   });
 });

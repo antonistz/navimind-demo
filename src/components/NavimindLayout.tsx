@@ -1,45 +1,33 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import RouteMap from './RouteMap';
 import KpiPanel from './KpiPanel';
 import AiExplanationPanel from './AiExplanationPanel';
 import VoyageInfoBar from './VoyageInfoBar';
 import AiChatPanel from './AiChatPanel';
-import type { Voyage, Route } from '../types';
+import { LoadingCard, LoadingPanel } from './LoadingPanel';
+import { getVoyages, getVoyageOptimization } from '../api/mockClient';
+import type { VoyageListItem, OptimizeResult } from '../types';
 import './NavimindLayout.css';
 
-const DEMO_VOYAGE: Voyage = {
-  id: 'Athens-Heraklion',
-  origin: 'Athens / Piraeus (GR)',
-  destination: 'Heraklion (GR)',
-  objective: 'Minimise fuel cost',
-  etaPlanned: '2025-12-05 08:00',
-  etaBaseline: '2025-12-05 08:00',
-  etaOptimal: '2025-12-05 08:00',
-  fuelBaselineTons: 35,
-  fuelOptimalTons: 32,
-  maxWaveBaseline: 3.2,
-  maxWaveOptimal: 2.4,
-  co2Baseline: 110,
-  co2Optimal: 101,
-};
-
-const BASELINE_ROUTE: Route = [
-  [37.94, 23.62],
-  [37.2,  24.2],
-  [36.5,  25.0],
-  [35.34, 25.13],
-];
-
-const OPTIMAL_ROUTE: Route = [
-  [37.94, 23.62],
-  [36.9,  24.1],
-  [36.2,  24.8],
-  [35.6,  25.1],
-  [35.34, 25.13],
-];
+type Status = 'loading' | 'success' | 'error';
 
 function NavimindLayout() {
-  const [selectedVoyage] = useState<Voyage>(DEMO_VOYAGE);
+  const [voyageList, setVoyageList] = useState<VoyageListItem[]>([]);
+  const [selectedId, setSelectedId] = useState<string>('Athens-Heraklion');
+  const [result, setResult] = useState<OptimizeResult | null>(null);
+  const [status, setStatus] = useState<Status>('loading');
+
+  useEffect(() => {
+    getVoyages().then(setVoyageList);
+  }, []);
+
+  useEffect(() => {
+    setStatus('loading');
+    setResult(null);
+    getVoyageOptimization(selectedId)
+      .then(r => { setResult(r); setStatus('success'); })
+      .catch(() => setStatus('error'));
+  }, [selectedId]);
 
   return (
     <div className="navimind-container">
@@ -47,13 +35,22 @@ function NavimindLayout() {
         <div>
           <h1>NaviMind – Route Intelligence Demo</h1>
           <p className="subtitle">
-            Semi-functional preview – static data, real UX flow.
+            {status === 'loading' ? 'Optimizing route…' : 'AI-optimized routing · real UX flow · static data'}
           </p>
         </div>
         <div className="voyage-selector">
           <span className="label">Voyage:</span>
-          <select value={selectedVoyage.id} onChange={() => {}}>
-            <option value="Athens-Heraklion">Athens → Heraklion</option>
+          <select
+            value={selectedId}
+            onChange={e => setSelectedId(e.target.value)}
+            disabled={status === 'loading'}
+          >
+            {voyageList.length === 0
+              ? <option value={selectedId}>Loading…</option>
+              : voyageList.map(v => (
+                  <option key={v.id} value={v.id}>{v.label}</option>
+                ))
+            }
           </select>
         </div>
       </header>
@@ -61,19 +58,39 @@ function NavimindLayout() {
       <main className="navimind-main">
         <div className="navimind-left">
           <RouteMap
-            baselineRoute={BASELINE_ROUTE}
-            optimalRoute={OPTIMAL_ROUTE}
+            baselineRoute={result?.baselineRoute ?? []}
+            optimalRoute={result?.optimalRoute ?? []}
+            dangerZones={result?.dangerZones ?? []}
+            isLoading={status === 'loading'}
           />
         </div>
+
         <div className="navimind-right">
-          <KpiPanel voyage={selectedVoyage} />
-          <AiExplanationPanel voyage={selectedVoyage} />
-          <AiChatPanel voyage={selectedVoyage} />
+          {status === 'error' && (
+            <div className="navimind-error">
+              Failed to load voyage data.{' '}
+              <button onClick={() => setSelectedId(selectedId)}>Retry</button>
+            </div>
+          )}
+
+          {status === 'loading' || !result ? (
+            <>
+              <LoadingCard />
+              <LoadingPanel rows={3} />
+              <LoadingPanel rows={4} />
+            </>
+          ) : (
+            <>
+              <KpiPanel voyage={result.voyage} fuelHistory={result.fuelHistory} />
+              <AiExplanationPanel voyage={result.voyage} />
+              <AiChatPanel voyage={result.voyage} seedMessages={result.seedMessages} />
+            </>
+          )}
         </div>
       </main>
 
       <footer className="navimind-footer">
-        <VoyageInfoBar voyage={selectedVoyage} />
+        <VoyageInfoBar voyage={result?.voyage ?? null} isLoading={status === 'loading'} />
       </footer>
     </div>
   );

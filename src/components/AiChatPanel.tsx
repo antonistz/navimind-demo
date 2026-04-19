@@ -1,52 +1,75 @@
-import type { Voyage } from '../types';
+import { useState, useEffect, useRef } from 'react';
+import type { Voyage, ChatMessage } from '../types';
+import { matchChatResponse } from '../data/voyages';
 import './AiChatPanel.css';
-
-interface ChatMessage {
-  role: 'user' | 'ai';
-  time: string;
-  text: string;
-}
-
-function buildDemoMessages(voyage: Voyage): ChatMessage[] {
-  const fuelSavingPct = (
-    ((voyage.fuelBaselineTons - voyage.fuelOptimalTons) / voyage.fuelBaselineTons) * 100
-  ).toFixed(1);
-
-  return [
-    {
-      role: 'user',
-      time: '08:12 UTC',
-      text: `Why does the optimized route deviate south instead of following the straight line to ${voyage.destination}?`,
-    },
-    {
-      role: 'ai',
-      time: '08:12 UTC',
-      text:
-        `The straight-line track crosses an area with forecast head seas of ${voyage.maxWaveBaseline.toFixed(1)}–${(voyage.maxWaveBaseline + 0.4).toFixed(1)} m during your transit window. ` +
-        `By shifting ~25 NM south, the vessel sails in ${voyage.maxWaveOptimal.toFixed(1)}–${(voyage.maxWaveOptimal + 0.6).toFixed(1)} m following-to-beam seas, which reduces added resistance and slamming risk.`,
-    },
-    {
-      role: 'user',
-      time: '08:13 UTC',
-      text: 'How does that affect fuel and ETA?',
-    },
-    {
-      role: 'ai',
-      time: '08:13 UTC',
-      text:
-        `For this voyage, the southern corridor reduces fuel consumption by ~${fuelSavingPct}% versus the baseline route, ` +
-        `with no impact on requested ETA (arrival remains within the ${voyage.etaOptimal.split(' ')[1]} window). ` +
-        `If you tighten the ETA tolerance to ±30 minutes, NaviMind will slightly adjust speed but keep the same weather corridor.`,
-    },
-  ];
-}
 
 interface AiChatPanelProps {
   voyage: Voyage;
+  seedMessages: ChatMessage[];
 }
 
-function AiChatPanel({ voyage }: AiChatPanelProps) {
-  const demoMessages = buildDemoMessages(voyage);
+function nowUtc(): string {
+  return new Date().toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', timeZone: 'UTC' }) + ' UTC';
+}
+
+function AiChatPanel({ voyage, seedMessages }: AiChatPanelProps) {
+  const [messages, setMessages] = useState<ChatMessage[]>(seedMessages);
+  const [inputValue, setInputValue] = useState('');
+  const [isThinking, setIsThinking] = useState(false);
+  const [typingText, setTypingText] = useState('');
+  const [isTyping, setIsTyping] = useState(false);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const typingRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  // Reset when voyage changes
+  useEffect(() => {
+    setMessages(seedMessages);
+    setInputValue('');
+    setIsThinking(false);
+    setTypingText('');
+    setIsTyping(false);
+    if (typingRef.current) clearInterval(typingRef.current);
+  }, [seedMessages]);
+
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [messages, typingText, isThinking]);
+
+  function startTyping(fullText: string) {
+    setTypingText('');
+    setIsTyping(true);
+    let i = 0;
+    typingRef.current = setInterval(() => {
+      i++;
+      setTypingText(fullText.slice(0, i));
+      if (i >= fullText.length) {
+        clearInterval(typingRef.current!);
+        setIsTyping(false);
+        setTypingText('');
+        setMessages(prev => [...prev, { role: 'ai', time: nowUtc(), text: fullText }]);
+      }
+    }, 8);
+  }
+
+  function handleSend() {
+    const text = inputValue.trim();
+    if (!text || isThinking || isTyping) return;
+    const userMsg: ChatMessage = { role: 'user', time: nowUtc(), text };
+    setMessages(prev => [...prev, userMsg]);
+    setInputValue('');
+    setIsThinking(true);
+    setTimeout(() => {
+      setIsThinking(false);
+      const response = matchChatResponse(text, voyage.id);
+      startTyping(response);
+    }, 700);
+  }
+
+  function handleKey(e: React.KeyboardEvent<HTMLInputElement>) {
+    if (e.key === 'Enter') handleSend();
+  }
+
+  const fuelSavingPct = (((voyage.fuelBaselineTons - voyage.fuelOptimalTons) / voyage.fuelBaselineTons) * 100).toFixed(1);
 
   return (
     <section className="ai-chat-card">
@@ -54,37 +77,68 @@ function AiChatPanel({ voyage }: AiChatPanelProps) {
         <div>
           <h2>NaviMind Assistant</h2>
           <p className="ai-chat-subtitle">
-            Explain and stress-test route decisions in natural language.
+            Ask anything about this route — fuel, weather, ETA, safety.
           </p>
         </div>
-        <span className="ai-chat-badge">Demo</span>
+        <span className="ai-chat-badge">{fuelSavingPct}% fuel saved</span>
       </div>
 
       <div className="ai-chat-messages">
-        {demoMessages.map((msg, idx) => (
-          <div
-            key={idx}
-            className={`ai-chat-message ${msg.role === 'ai' ? 'ai' : 'user'}`}
-          >
+        {messages.map((msg, idx) => (
+          <div key={idx} className={`ai-chat-message ${msg.role}`}>
             <div className="ai-chat-meta">
-              <span className="ai-chat-role">
-                {msg.role === 'ai' ? 'NaviMind' : 'Operator'}
-              </span>
+              <span className="ai-chat-role">{msg.role === 'ai' ? 'NaviMind' : 'Operator'}</span>
               <span className="ai-chat-dot">•</span>
               <span className="ai-chat-time">{msg.time}</span>
             </div>
             <div className="ai-chat-bubble">{msg.text}</div>
           </div>
         ))}
+
+        {isThinking && (
+          <div className="ai-chat-message ai">
+            <div className="ai-chat-meta">
+              <span className="ai-chat-role">NaviMind</span>
+              <span className="ai-chat-dot">•</span>
+              <span className="ai-chat-time">{nowUtc()}</span>
+            </div>
+            <div className="ai-chat-bubble thinking-bubble">
+              <span className="thinking-dot" /><span className="thinking-dot" /><span className="thinking-dot" />
+            </div>
+          </div>
+        )}
+
+        {isTyping && typingText && (
+          <div className="ai-chat-message ai">
+            <div className="ai-chat-meta">
+              <span className="ai-chat-role">NaviMind</span>
+              <span className="ai-chat-dot">•</span>
+              <span className="ai-chat-time">{nowUtc()}</span>
+            </div>
+            <div className="ai-chat-bubble">
+              {typingText}<span className="typing-cursor" />
+            </div>
+          </div>
+        )}
+
+        <div ref={messagesEndRef} />
       </div>
 
-      <div className="ai-chat-input-bar">
+      <div className="ai-chat-input-bar active">
         <input
           type="text"
-          placeholder="Type a question about this route… (demo mode)"
-          disabled
+          value={inputValue}
+          onChange={e => setInputValue(e.target.value)}
+          onKeyDown={handleKey}
+          placeholder="Ask about fuel, weather, ETA, safety…"
+          disabled={isThinking || isTyping}
         />
-        <button disabled>Send</button>
+        <button
+          onClick={handleSend}
+          disabled={isThinking || isTyping || !inputValue.trim()}
+        >
+          Send
+        </button>
       </div>
     </section>
   );

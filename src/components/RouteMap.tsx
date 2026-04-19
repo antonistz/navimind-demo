@@ -1,7 +1,7 @@
-import { useEffect, useMemo } from 'react';
-import { MapContainer, TileLayer, Polyline, useMap, Marker } from 'react-leaflet';
+import { useEffect, useMemo, useState } from 'react';
+import { MapContainer, TileLayer, Polyline, useMap, Marker, Circle, Popup } from 'react-leaflet';
 import L from 'leaflet';
-import type { Route } from '../types';
+import type { Route, DangerZone } from '../types';
 import './RouteMap.css';
 
 interface FitBoundsProps {
@@ -31,11 +31,19 @@ function FitBounds({ baselineRoute, optimalRoute }: FitBoundsProps) {
 interface RouteMapProps {
   baselineRoute: Route;
   optimalRoute: Route;
+  dangerZones: DangerZone[];
+  isLoading?: boolean;
 }
 
-function RouteMap({ baselineRoute, optimalRoute }: RouteMapProps) {
+const SEVERITY_COLORS: Record<DangerZone['severity'], { stroke: string; fill: string }> = {
+  moderate: { stroke: '#f59e0b', fill: '#f59e0b' },
+  severe:   { stroke: '#ef4444', fill: '#ef4444' },
+};
+
+function RouteMap({ baselineRoute, optimalRoute, dangerZones, isLoading = false }: RouteMapProps) {
   const initialCenter: [number, number] = [37.5, 23.5];
   const initialZoom = 5;
+  const [showDangerZones, setShowDangerZones] = useState(true);
 
   const { baselineMid, optimalMid, baselineLabelIcon, optimalLabelIcon } = useMemo(() => {
     const baselineMid = baselineRoute.length
@@ -62,6 +70,8 @@ function RouteMap({ baselineRoute, optimalRoute }: RouteMapProps) {
 
   return (
     <div className="route-map-wrapper">
+      {isLoading && <div className="map-loading-overlay"><span>Optimizing…</span></div>}
+
       <MapContainer
         center={initialCenter}
         zoom={initialZoom}
@@ -71,6 +81,23 @@ function RouteMap({ baselineRoute, optimalRoute }: RouteMapProps) {
           attribution="&copy; OpenStreetMap contributors"
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
+
+        {showDangerZones && dangerZones.map((zone, i) => (
+          <Circle
+            key={i}
+            center={zone.center}
+            radius={zone.radiusMeters}
+            pathOptions={{
+              color:       SEVERITY_COLORS[zone.severity].stroke,
+              fillColor:   SEVERITY_COLORS[zone.severity].fill,
+              fillOpacity: 0.18,
+              weight:      1.5,
+              dashArray:   '4 4',
+            }}
+          >
+            <Popup>{zone.label}</Popup>
+          </Circle>
+        ))}
 
         {baselineRoute.length > 0 && (
           <Polyline
@@ -87,11 +114,7 @@ function RouteMap({ baselineRoute, optimalRoute }: RouteMapProps) {
         )}
 
         {baselineMid && (
-          <Marker
-            position={baselineMid}
-            icon={baselineLabelIcon}
-            interactive={false}
-          />
+          <Marker position={baselineMid} icon={baselineLabelIcon} interactive={false} />
         )}
 
         {optimalMid && (
@@ -102,10 +125,9 @@ function RouteMap({ baselineRoute, optimalRoute }: RouteMapProps) {
           />
         )}
 
-        <FitBounds
-          baselineRoute={baselineRoute}
-          optimalRoute={optimalRoute}
-        />
+        {baselineRoute.length > 0 && (
+          <FitBounds baselineRoute={baselineRoute} optimalRoute={optimalRoute} />
+        )}
       </MapContainer>
 
       <div className="route-legend">
@@ -117,7 +139,29 @@ function RouteMap({ baselineRoute, optimalRoute }: RouteMapProps) {
           <span className="legend-line optimal" />
           <span>NaviMind – AI-optimized route</span>
         </div>
+        {dangerZones.length > 0 && (
+          <>
+            <div className="legend-item">
+              <span className="legend-swatch moderate" />
+              <span>Moderate sea state</span>
+            </div>
+            <div className="legend-item">
+              <span className="legend-swatch severe" />
+              <span>Severe sea state</span>
+            </div>
+          </>
+        )}
       </div>
+
+      {dangerZones.length > 0 && (
+        <button
+          className={`wave-toggle-btn ${showDangerZones ? 'active' : ''}`}
+          onClick={() => setShowDangerZones(s => !s)}
+          title="Toggle wave danger zones"
+        >
+          {showDangerZones ? '🌊 Hide wave zones' : '🌊 Show wave zones'}
+        </button>
+      )}
     </div>
   );
 }

@@ -19,7 +19,6 @@ describe('AiExplanationPanel', () => {
   });
 
   it('shows calculated fuel saving percentage', () => {
-    // (35 - 32) / 35 * 100 = 8.6%
     render(<AiExplanationPanel voyage={mockVoyage} />);
     expect(screen.getByText(/8\.6%/)).toBeInTheDocument();
   });

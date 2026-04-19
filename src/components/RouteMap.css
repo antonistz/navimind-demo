@@ -69,8 +69,65 @@
   border-color: #22d3ee;
 }
 
+.map-loading-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(15, 23, 42, 0.55);
+  border-radius: 0.75rem;
+  pointer-events: none;
+}
+
+.map-loading-overlay span {
+  background: rgba(15, 23, 42, 0.9);
+  color: #22d3ee;
+  border: 1px solid #22d3ee40;
+  border-radius: 999px;
+  padding: 0.35rem 1rem;
+  font-size: 0.8rem;
+  letter-spacing: 0.05em;
+}
+
+.legend-swatch {
+  width: 12px;
+  height: 12px;
+  border-radius: 2px;
+  flex-shrink: 0;
+}
+
+.legend-swatch.moderate { background: #f59e0b; opacity: 0.7; }
+.legend-swatch.severe   { background: #ef4444; opacity: 0.7; }
+
+.wave-toggle-btn {
+  position: absolute;
+  bottom: 12px;
+  right: 12px;
+  z-index: 800;
+  background: rgba(15, 23, 42, 0.9);
+  border: 1px solid #1f2937;
+  border-radius: 999px;
+  color: #9ca3af;
+  font-size: 0.72rem;
+  padding: 0.3rem 0.75rem;
+  cursor: pointer;
+  transition: border-color 0.15s, color 0.15s;
+}
+
+.wave-toggle-btn.active {
+  border-color: #22d3ee60;
+  color: #e5e7eb;
+}
+
+.wave-toggle-btn:hover {
+  border-color: #22d3ee;
+  color: #22d3ee;
+}
+
 @media (max-width: 640px) {
   .route-map-wrapper {
-    min-height: 360px;   /* shorter but still usable on phones */
+    min-height: 360px;
   }
 }

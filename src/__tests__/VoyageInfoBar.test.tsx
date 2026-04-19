@@ -22,8 +22,8 @@ describe('VoyageInfoBar', () => {
     expect(screen.getByText(/Minimise fuel cost/)).toBeInTheDocument();
   });
 
-  it('indicates demo mode', () => {
-    render(<VoyageInfoBar voyage={mockVoyage} />);
-    expect(screen.getByText(/Static data/)).toBeInTheDocument();
+  it('shows loading state when isLoading is true', () => {
+    render(<VoyageInfoBar voyage={null} isLoading={true} />);
+    expect(screen.getByText('Optimizing…')).toBeInTheDocument();
   });
 });
