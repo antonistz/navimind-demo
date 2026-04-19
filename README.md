@@ -1,4 +1,4 @@
-# NaviMind – Route Intelligence Demo
+# NaviMind - Route Intelligence Demo
 
 AI-optimized maritime routing · React 19 + TypeScript · Vite 7
 
@@ -8,13 +8,13 @@ AI-optimized maritime routing · React 19 + TypeScript · Vite 7
 
 NaviMind was originally presented as a UI demo at the **GreenTech Challenge 2025 finals**. The Python route optimization engine is proprietary and is not included in this repository.
 
-This repo has since been rebuilt from the ground up as a fully typed, tested, production-track frontend — evolving well beyond the original demo.
+This repo has since been rebuilt from the ground up as a fully typed, tested, production-track frontend - evolving well beyond the original demo.
 
 ---
 
 ## Current status
 
-**Phase 1 complete** — interactive demo running against a mock API.
+**Phase 1 complete** - interactive demo running against a mock API.
 
 | Layer | Status |
 |---|---|
